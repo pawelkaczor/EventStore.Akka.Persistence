@@ -52,7 +52,7 @@ class EventStoreSnapshotStore extends SnapshotStore with EventStorePlugin {
 
   def saveAsync(metadata: SnapshotMetadata, snapshot: Any) = asyncUnit {
     val streamId = eventStream(metadata.persistenceId)
-    connection.future(WriteEvents(streamId, List(serialize(Snapshot(snapshot, metadata), Some(snapshot)))))
+    connection.future(WriteEvents(streamId, List(serialize(Snapshot(snapshot, metadata)))))
   }
 
   def saved(metadata: SnapshotMetadata) = {}
@@ -71,7 +71,7 @@ class EventStoreSnapshotStore extends SnapshotStore with EventStorePlugin {
 
   def delete(persistenceId: PersistenceId, se: DeleteEvent): Unit = {
     val streamId = eventStream(persistenceId)
-    val future = connection.future(WriteEvents(streamId, List(serialize(se, None))))
+    val future = connection.future(WriteEvents(streamId, List(serialize(se))))
     Await.result(future, deleteAwait)
   }
 }

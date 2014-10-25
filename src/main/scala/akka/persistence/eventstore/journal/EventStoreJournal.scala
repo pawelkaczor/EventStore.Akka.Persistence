@@ -19,7 +19,7 @@ class EventStoreJournal extends AsyncWriteJournal with EventStorePlugin {
   def asyncWriteMessages(messages: Seq[PersistentRepr]) = asyncSeq {
     messages.groupBy(_.persistenceId).map {
       case (persistenceId, msgs) =>
-        val events = msgs.map(x => serialize(x, Some(x.payload)))
+        val events = msgs.map(x => serialize(x))
         val expVer = msgs.head.sequenceNr - 1 match {
           case 0L => ExpectedVersion.NoStream
           case x  => ExpectedVersion.Exact(eventNumber(x))
