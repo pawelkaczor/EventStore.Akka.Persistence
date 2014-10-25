@@ -4,7 +4,7 @@ import akka.serialization.Serializer
 import eventstore.{ Event, EventData }
 
 trait EventStoreSerializer extends Serializer {
-  def toPayloadAndMetadata(e: AnyRef) = (e, None)
+  def toPayloadAndMetadata(e: AnyRef): (AnyRef, Option[AnyRef]) = (e, None)
   def fromPayloadAndMetadata(payload: AnyRef, metadata: Option[AnyRef]) = payload
 
   def toEvent(o: AnyRef): EventData

@@ -1,7 +1,7 @@
 package akka.persistence.eventstore
 
 import akka.actor.{ ActorLogging, Actor }
-import akka.persistence.{ Persistent, PersistentRepr }
+import akka.persistence.PersistentRepr
 import akka.persistence.eventstore.snapshot.EventStoreSnapshotStore.SnapshotEvent
 import akka.serialization.{ SerializationExtension, Serialization }
 import eventstore.Content.Empty
