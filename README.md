@@ -27,7 +27,7 @@ Serialization part:
   def serialize(pr: PersistentRepr): EventData = {
     val prPayload = pr.payload.asInstanceOf[AnyRef]
 
-    serialization.findSerializerFor(prPayload) match {
+    serialization.findSerializerFor(pr) match {
       case ser: EventStoreSerializer =>
         val (payload, metadata) = ser.toPayloadAndMetadata(prPayload)
         toEventData(pr.withPayload(payload).asInstanceOf[PersistentRepr], metadata)
