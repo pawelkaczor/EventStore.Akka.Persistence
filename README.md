@@ -37,9 +37,9 @@ Serialization part:
   }
 ```
 
-During serialization, original payload of ``PersistentRepr`` is replaced with payload returned by toPayloadAndMetadata method.
+During serialization, original payload of ``PersistentRepr`` is replaced with payload returned by ``toPayloadAndMetadata`` method.
 This mechanism is used by [json serializer] (https://github.com/pawelkaczor/akka-ddd/blob/master/eventstore-akka-persistence/src/main/scala/pl/newicom/eventstore/Json4sEsSerializer.scala)
-from [akka-ddd](https://github.com/pawelkaczor/akka-ddd) project to break down EventMessage into event payload and metadata
-before storing in EventStore journal. In result business data (business event, its metadata and its type) are mapped to EventStore's eventData, metadata and eventType
-without being wrapped into PersistentRepr/EventMessage envelope (business event, metadata) or being lost (eventType).
+from [akka-ddd](https://github.com/pawelkaczor/akka-ddd) project to break down [EventMessage](https://github.com/pawelkaczor/akka-ddd/blob/master/akka-ddd-messaging/src/main/scala/pl/newicom/dddd/messaging/event/EventMessage.scala) into event payload and metadata
+before storing to EventStore journal. In result, business event, its metadata and its type are mapped to EventStore's eventData, metadata and ``eventType``
+without being wrapped into ``PersistentRepr/EventMessage`` envelope (business event, metadata) or being lost (``eventType``).
 This in turn allows easy debugging and especially easy creation of user projections.
