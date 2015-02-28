@@ -18,14 +18,14 @@ trait EventStorePlugin extends ActorLogging { self: Actor =>
   def deserialize[T](event: Event, clazz: Class[T]): T = {
     val ser = serialization.serializerFor(clazz)
     val res = ser match {
-      case ser: EventStoreSerializer =>
+      case ser: EventStoreSerializer if clazz != classOf[PersistentRepr] =>
         ser.fromEvent(event, clazz)
       case _ =>
         val ed = event.data
         val pr = ser.fromBinary(ed.data.value.toArray, clazz).asInstanceOf[PersistentRepr]
         val payload = pr.payload.asInstanceOf[AnyRef]
 
-        serialization.findSerializerFor(payload) match {
+        serialization.findSerializerFor(pr) match {
           case ser: EventStoreSerializer =>
             val byteString = ed.metadata.value
             val metadata = if (byteString.isEmpty) None else Some(ser.fromBinary(byteString.toArray, None))
@@ -47,7 +47,7 @@ trait EventStorePlugin extends ActorLogging { self: Actor =>
   def serialize(pr: PersistentRepr): EventData = {
     val prPayload = pr.payload.asInstanceOf[AnyRef]
 
-    serialization.findSerializerFor(prPayload) match {
+    serialization.findSerializerFor(pr) match {
       case ser: EventStoreSerializer =>
         val (payload, metadata) = ser.toPayloadAndMetadata(prPayload)
         toEventData(pr.withPayload(payload).asInstanceOf[PersistentRepr], metadata)
