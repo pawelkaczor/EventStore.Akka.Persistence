@@ -13,18 +13,19 @@ object Build extends Build {
     startYear            := Some(2013),
     scalacOptions        := Seq("-encoding", "UTF-8", "-unchecked", "-deprecation", "-feature", "-Xlint"),
     publishMavenStyle    := true,
+    resolvers            += "Akka Snapshot Repository" at "http://repo.akka.io/snapshots/",
     libraryDependencies ++= Seq(
       Akka.persistence, Akka.testkit, Akka.persistenceTck, eventstore, specs2, json4s))
 
   object Akka {
     val persistence    = apply("persistence-experimental")
-    val persistenceTck = apply("persistence-tck-experimental") % "test"
+    val persistenceTck = "com.typesafe.akka" %% "akka-persistence-tck-experimental" % "2.3.9" % "test"
     val testkit        = apply("testkit") % "test"
 
-    private def apply(x: String) = "com.typesafe.akka" %% s"akka-$x" % "2.3.9"
+    private def apply(x: String) = "com.typesafe.akka" %% s"akka-$x" % "2.4-SNAPSHOT"
   }
 
-  val eventstore = "com.geteventstore" %% "eventstore-client" % "2.0.0"
+  val eventstore = "pl.newicom.dddd" %% "eventstore-client" % "2.0.2-SNAPSHOT"
   val specs2     = "org.specs2" %% "specs2-core" % "2.4.15" % "test"
   val json4s     = "org.json4s" %% "json4s-native" % "3.2.11"
 

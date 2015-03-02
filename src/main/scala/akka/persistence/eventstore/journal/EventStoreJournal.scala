@@ -1,7 +1,7 @@
 package akka.persistence.eventstore.journal
 
 import akka.persistence.journal.AsyncWriteJournal
-import akka.persistence.{ PersistentConfirmation, PersistentRepr }
+import akka.persistence.PersistentRepr
 import akka.persistence.eventstore.Helpers._
 import akka.persistence.eventstore.{ UrlEncoder, EventStorePlugin }
 import scala.collection.immutable.Seq
@@ -29,7 +29,7 @@ class EventStoreJournal extends AsyncWriteJournal with EventStorePlugin {
     }
   }
 
-  def asyncDeleteMessagesTo(persistenceId: PersistenceId, to: SequenceNr, permanent: Boolean) = asyncUnit {
+  def asyncDeleteMessagesTo(persistenceId: String, to: SequenceNr, permanent: Boolean) = asyncUnit {
     val json =
       if (!permanent) s"""{"$DeleteTo":$to}"""
       else deleteToCache.get(persistenceId).fold(s"""{"$TruncateBefore":$to}""") {
@@ -64,14 +64,6 @@ class EventStoreJournal extends AsyncWriteJournal with EventStorePlugin {
       }
     }
     asyncReplayMessages(eventNumber(from), eventNumber(to), max.toIntOrError)
-  }
-
-  def asyncWriteConfirmations(cs: Seq[PersistentConfirmation]) = {
-    Future.failed(new NotImplementedError("asyncWriteConfirmations is deprecated and not supported"))
-  }
-
-  def asyncDeleteMessages(messageIds: Seq[akka.persistence.PersistentId], permanent: Boolean) = {
-    Future.failed(new NotImplementedError("asyncDeleteMessages is deprecated and not supported"))
   }
 
   def eventStream(x: PersistenceId): EventStream.Plain = EventStream(UrlEncoder(x)) match {
