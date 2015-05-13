@@ -6,7 +6,7 @@ object Build extends Build {
   lazy val basicSettings = Seq(
     name                 := "akka-persistence-eventstore",
     organization         := "pl.newicom.dddd",
-    scalaVersion         := "2.11.5",
+    scalaVersion         := "2.11.6",
     licenses             := Seq("BSD 3-Clause" -> url("http://raw.github.com/EventStore/EventStore.Akka.Persistence/master/LICENSE")),
     homepage             := Some(new URL("http://github.com/pawelkaczor/EventStore.Akka.Persistence")),
     description          := "Event Store Plugin for Akka Persistence",
@@ -25,7 +25,7 @@ object Build extends Build {
     private def apply(x: String) = "com.typesafe.akka" %% s"akka-$x" % "2.4-SNAPSHOT"
   }
 
-  val eventstore = "pl.newicom.dddd" %% "eventstore-client" % "2.0.2-SNAPSHOT"
+  val eventstore = "pl.newicom.dddd" %% "eventstore-client" % "2.0.3-SNAPSHOT"
   val specs2     = "org.specs2" %% "specs2-core" % "2.4.15" % "test"
   val json4s     = "org.json4s" %% "json4s-native" % "3.2.11"
 
