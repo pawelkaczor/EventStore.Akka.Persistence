@@ -22,10 +22,10 @@ object Build extends Build {
     val persistenceTck = "com.typesafe.akka" %% "akka-persistence-tck-experimental" % "2.3.9" % "test"
     val testkit        = apply("testkit") % "test"
 
-    private def apply(x: String) = "com.typesafe.akka" %% s"akka-$x" % "2.4-SNAPSHOT"
+    private def apply(x: String) = "com.typesafe.akka" %% s"akka-$x" % "2.4-M1"
   }
 
-  val eventstore = "pl.newicom.dddd" %% "eventstore-client" % "2.0.3-SNAPSHOT"
+  val eventstore = "pl.newicom.dddd" %% "eventstore-client" % "2.0.3-M1"
   val specs2     = "org.specs2" %% "specs2-core" % "2.4.15" % "test"
   val json4s     = "org.json4s" %% "json4s-native" % "3.2.11"
 
