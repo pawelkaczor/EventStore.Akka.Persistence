@@ -13,7 +13,6 @@ object Build extends Build {
     startYear            := Some(2013),
     scalacOptions        := Seq("-encoding", "UTF-8", "-unchecked", "-deprecation", "-feature", "-Xlint"),
     publishMavenStyle    := true,
-    resolvers            ++= Seq("Akka Snapshot Repository" at "http://repo.akka.io/snapshots/", "Sonatype Snapshots Nexus" at "https://oss.sonatype.org/content/repositories/snapshots"),
     libraryDependencies ++= Seq(
       Akka.persistence, Akka.testkit, Akka.persistenceTck, eventstore, specs2, json4s))
 
