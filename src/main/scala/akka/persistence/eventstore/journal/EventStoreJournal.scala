@@ -1,14 +1,15 @@
 package akka.persistence.eventstore.journal
 
-import akka.persistence.journal.AsyncWriteJournal
-import akka.persistence.PersistentRepr
+import java.util.concurrent.ConcurrentHashMap
 import akka.persistence.eventstore.Helpers._
-import akka.persistence.eventstore.{ UrlEncoder, EventStorePlugin }
-import scala.collection.immutable.Seq
-import scala.concurrent.Future
+import akka.persistence.eventstore.{ EventStorePlugin, UrlEncoder }
+import akka.persistence.journal.AsyncWriteJournal
+import akka.persistence.{ PersistentRepr }
 import eventstore._
 import org.json4s.DefaultFormats
 import org.json4s.native.JsonMethods.parse
+import scala.collection.immutable.Seq
+import scala.concurrent.Future
 
 class EventStoreJournal extends AsyncWriteJournal with EventStorePlugin {
   import EventStoreJournal._
@@ -16,20 +17,33 @@ class EventStoreJournal extends AsyncWriteJournal with EventStorePlugin {
 
   val deleteToCache = new DeleteToCache()
 
-  def asyncWriteMessages(messages: Seq[PersistentRepr]) = asyncSeq {
-    messages.groupBy(_.persistenceId).map {
-      case (persistenceId, msgs) =>
-        val events = msgs.map(x => serialize(x))
-        val expVer = msgs.head.sequenceNr - 1 match {
-          case 0L => ExpectedVersion.NoStream
-          case x  => ExpectedVersion.Exact(eventNumber(x))
+  def config = context.system.settings.config.getConfig("eventstore.persistence.journal")
+
+  def asyncWriteMessages(messages: Seq[PersistentRepr]) = asyncUnit {
+    def write(persistenceId: PersistenceId, messages: Seq[PersistentRepr]) = {
+      val events = messages.map(x => serialize(x, Some(x.payload)))
+      val expVer = messages.head.sequenceNr - 1 match {
+        case 0L => ExpectedVersion.NoStream
+        case x  => ExpectedVersion.Exact(eventNumber(x))
+      }
+      val req = WriteEvents(eventStream(persistenceId), events.toList, expVer)
+      connection.future(req)
+    }
+
+    val map = messages.groupBy(_.persistenceId)
+    map.size match {
+      case 0 => Future.successful(())
+      case 1 =>
+        val (persistenceId, messages) = map.head
+        write(persistenceId, messages)
+      case _ =>
+        Future.traverse(map) {
+          case (persistenceId, messages) => write(persistenceId, messages)
         }
-        val req = WriteEvents(eventStream(persistenceId), events.toList, expVer)
-        connection.future(req)
     }
   }
 
-  def asyncDeleteMessagesTo(persistenceId: String, to: SequenceNr, permanent: Boolean) = asyncUnit {
+  def asyncDeleteMessagesTo(persistenceId: PersistenceId, to: SequenceNr, permanent: Boolean) = asyncUnit {
     val json =
       if (!permanent) s"""{"$DeleteTo":$to}"""
       else deleteToCache.get(persistenceId).fold(s"""{"$TruncateBefore":$to}""") {
@@ -63,14 +77,10 @@ class EventStoreJournal extends AsyncWriteJournal with EventStorePlugin {
         }
       }
     }
-    if (to == 0L) {
-      Future(())
-    } else {
-      asyncReplayMessages(eventNumber(from), eventNumber(to), max.toIntOrError)
-    }
+    asyncReplayMessages(eventNumber(from), eventNumber(to), max.toIntOrError)
   }
 
-  def eventStream(x: PersistenceId): EventStream.Plain = EventStream(UrlEncoder(x)) match {
+  def eventStream(x: PersistenceId): EventStream.Plain = EventStream(prefix + UrlEncoder(x)) match {
     case plain: EventStream.Plain => plain
     case other                    => sys.error(s"Cannot create plain event stream for $x")
   }
@@ -98,11 +108,14 @@ object EventStoreJournal {
   val DeleteTo = "ap-deleteTo"
 
   class DeleteToCache {
-    private var map = Map[PersistenceId, SequenceNr]()
-    def get(persistenceId: PersistenceId): Option[SequenceNr] = map.get(persistenceId)
+    private val map = new ConcurrentHashMap[PersistenceId, SequenceNr]()
 
-    def add(persistenceId: PersistenceId, sequenceNr: SequenceNr): Unit = synchronized {
-      map = map + (persistenceId -> sequenceNr)
+    def get(persistenceId: PersistenceId): Option[SequenceNr] = {
+      Option(map.get(persistenceId))
+    }
+
+    def add(persistenceId: PersistenceId, sequenceNr: SequenceNr): Unit = {
+      map.put(persistenceId, sequenceNr)
     }
   }
 }
