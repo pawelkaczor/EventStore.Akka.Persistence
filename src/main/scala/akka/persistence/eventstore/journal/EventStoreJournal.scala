@@ -77,7 +77,11 @@ class EventStoreJournal extends AsyncWriteJournal with EventStorePlugin {
         }
       }
     }
-    asyncReplayMessages(eventNumber(from), eventNumber(to), max.toIntOrError)
+    if (to == 0L) {
+      Future(())
+    } else {
+      asyncReplayMessages(eventNumber(from), eventNumber(to), max.toIntOrError)
+    }
   }
 
   def eventStream(x: PersistenceId): EventStream.Plain = EventStream(prefix + UrlEncoder(x)) match {
