@@ -4,4 +4,4 @@
 
 **This is a fork of [https://github.com/EventStore/EventStore.Akka.Persistence](https://github.com/EventStore/EventStore.Akka.Persistence)**
 
-This fork will be removed once [allow skipping recovery (toSequenceNr is 0)](https://github.com/EventStore/EventStore.Akka.Persistence/issues/16) is implemented.  
+This fork is obsolete, should be used only with Akka-DDD versions prior to 1.0.4!
