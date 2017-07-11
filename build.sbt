@@ -4,7 +4,7 @@ import scalariform.formatter.preferences._
 
 name := "akka-persistence-eventstore"
 
-organization := "com.geteventstore"
+organization := "pl.newicom.dddd"
 
 scalaVersion := "2.12.2"
 
@@ -62,15 +62,15 @@ lazy val root = (project in file("."))
 
 pomExtra in Global := {
   <scm>
-    <url>git@github.com:EventStore/EventStore.Akka.Persistence.git</url>
-    <connection>scm:git:git@github.com:EventStore/EventStore.Akka.Persistence.git</connection>
-    <developerConnection>scm:git:git@github.com:EventStore/EventStore.Akka.Persistence.git</developerConnection>
+    <url>git@github.com:pawelkaczor/EventStore.Akka.Persistence.git</url>
+    <connection>scm:git:git@github.com:pawelkaczor/EventStore.Akka.Persistence.git</connection>
+    <developerConnection>scm:git:git@github.com:pawelkaczor/EventStore.Akka.Persistence.git</developerConnection>
   </scm>
     <developers>
       <developer>
-        <id>t3hnar</id>
-        <name>Yaroslav Klymko</name>
-        <email>t3hnar@gmail.com</email>
+        <id>pawelkaczor</id>
+        <name>Pawel Kaczor</name>
+        <email>newion@o2.pl</email>
       </developer>
     </developers>
 }
